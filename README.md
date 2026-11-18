@@ -29,4 +29,4 @@ cp .env.example .env             # Windows: copy .env.example .env
 
 ## 기록
 
-- 2026-11-18: GitHub 연결 테스트 (push 확인)
+- 2026-11-18: GitHub 연결 테스트, 1단계 파일 준비, Windows 설치 안내서 작성 (`docs/setup-guide.html`)
