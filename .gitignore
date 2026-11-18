@@ -1,0 +1,11 @@
+# API 키 (절대 GitHub에 올리지 않음)
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 결과물 (생성된 이미지 등)
+outputs/
