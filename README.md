@@ -30,3 +30,4 @@ cp .env.example .env             # Windows: copy .env.example .env
 ## 기록
 
 - 2026-11-18: GitHub 연결 테스트, 1단계 파일 준비, Windows 설치 안내서 작성 (`docs/setup-guide.html`)
+- 2026-11-19: 2~4단계 완성. 에이전트 첫 실행 성공 (`results/20261119_1357_QISW1mMdK-0_report.md`)
