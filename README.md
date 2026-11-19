@@ -24,7 +24,7 @@ cp .env.example .env             # Windows: copy .env.example .env
 
 - [x] 1단계: Claude 연결 테스트 — `python hello_claude.py`
 - [x] 2단계: Gemini 동영상 분석 — `python analyze_video.py 유튜브링크`
-- [ ] 3단계: GPT 이미지 생성
+- [x] 3단계: GPT 이미지 생성 — `python make_image.py "이미지 설명"`
 - [ ] 4단계: Claude 지휘자에 두 도구 연결
 
 ## 기록
