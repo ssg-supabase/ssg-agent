@@ -1,0 +1,50 @@
+"""Gemini로 동영상을 분석하는 도구.
+
+유튜브 링크(공개 영상)나 내 컴퓨터의 동영상 파일 모두 사용할 수 있습니다.
+"""
+import os
+import re
+import time
+
+from google import genai
+from google.genai import types
+
+# .env 에 GEMINI_MODEL=... 을 적으면 다른 모델로 바꿀 수 있습니다.
+DEFAULT_MODEL = "gemini-3.8-flash"
+
+
+def _normalize_youtube_url(url: str) -> str:
+    """youtube.com/shorts/ID, youtu.be/ID 형식을 표준 watch?v=ID 형식으로 바꿉니다."""
+    m = re.search(r"(?:shorts/|youtu\.be/|v=)([A-Za-z0-9_-]{11})", url)
+    return f"https://www.youtube.com/watch?v={m.group(1)}" if m else url
+
+
+def _video_part(client: genai.Client, source: str) -> types.Part:
+    """유튜브 링크면 그대로, 파일이면 Gemini에 업로드해서 분석 재료로 만듭니다."""
+    if source.startswith("http"):
+        return types.Part(file_data=types.FileData(file_uri=_normalize_youtube_url(source)))
+
+    print("동영상 업로드 중...")
+    uploaded = client.files.upload(file=source)
+    while uploaded.state == types.FileState.PROCESSING:
+        time.sleep(3)
+        uploaded = client.files.get(name=uploaded.name)
+    if uploaded.state == types.FileState.FAILED:
+        raise RuntimeError("Gemini가 동영상 파일을 처리하지 못했습니다.")
+    return types.Part(file_data=types.FileData(file_uri=uploaded.uri, mime_type=uploaded.mime_type))
+
+
+def analyze_video(source: str, question: str) -> str:
+    """동영상을 Gemini로 분석하고 결과 텍스트를 돌려줍니다.
+
+    Args:
+        source: 유튜브 링크 또는 동영상 파일 경로
+        question: 영상에 대해 알고 싶은 것
+    """
+    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    model = os.getenv("GEMINI_MODEL", DEFAULT_MODEL)
+    response = client.models.generate_content(
+        model=model,
+        contents=types.Content(parts=[_video_part(client, source), types.Part(text=question)]),
+    )
+    return response.text
