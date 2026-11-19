@@ -7,10 +7,12 @@ import re
 import time
 
 from google import genai
-from google.genai import types
+from google.genai import errors, types
 
 # .env 에 GEMINI_MODEL=... 을 적으면 다른 모델로 바꿀 수 있습니다.
 DEFAULT_MODEL = "gemini-3.8-flash"
+# 기본 모델이 붐비거나(503) 없을 때(404) 차례로 시도할 예비 모델
+BACKUP_MODELS = ["gemini-3.5-flash", "gemini-2.5-flash"]
 
 
 def _normalize_youtube_url(url: str) -> str:
@@ -42,9 +44,16 @@ def analyze_video(source: str, question: str) -> str:
         question: 영상에 대해 알고 싶은 것
     """
     client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
-    model = os.getenv("GEMINI_MODEL", DEFAULT_MODEL)
-    response = client.models.generate_content(
-        model=model,
-        contents=types.Content(parts=[_video_part(client, source), types.Part(text=question)]),
-    )
-    return response.text
+    contents = types.Content(parts=[_video_part(client, source), types.Part(text=question)])
+    models = [os.getenv("GEMINI_MODEL", DEFAULT_MODEL)] + BACKUP_MODELS
+
+    for i, model in enumerate(models):
+        try:
+            response = client.models.generate_content(model=model, contents=contents)
+            print(f"(사용한 모델: {model})")
+            return response.text
+        except (errors.ServerError, errors.ClientError) as e:
+            busy_or_missing = e.code in (404, 429, 500, 503)
+            if not busy_or_missing or i == len(models) - 1:
+                raise
+            print(f"{model} 사용 불가({e.code}) → {models[i + 1]} 로 다시 시도합니다...")
