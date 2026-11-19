@@ -3,7 +3,10 @@
 실행:  python analyze_video.py 유튜브링크
 예)    python analyze_video.py https://www.youtube.com/shorts/QISW1mMdK-0
 """
+import re
 import sys
+from datetime import datetime
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -24,5 +27,15 @@ if len(sys.argv) < 2:
     print("사용법: python analyze_video.py 유튜브링크_또는_파일경로")
     sys.exit(1)
 
+source = sys.argv[1]
 print("Gemini가 영상을 보는 중... (10~60초)")
-print(analyze_video(sys.argv[1], QUESTION))
+result = analyze_video(source, QUESTION)
+print(result)
+
+# 결과를 results 폴더에 파일로 저장 (git push 하면 Claude도 볼 수 있음)
+m = re.search(r"(?:shorts/|youtu\.be/|v=)([A-Za-z0-9_-]{11})", source)
+name = m.group(1) if m else Path(source).stem
+out = Path("results") / f"{datetime.now():%Y%m%d}_{name}.md"
+out.parent.mkdir(exist_ok=True)
+out.write_text(f"# 영상 분석: {source}\n\n{result}\n", encoding="utf-8")
+print(f"\n[저장됨] {out}")
