@@ -1,0 +1,30 @@
+[
+  {
+    "model": "gemini-3.8-flash",
+    "prompt": 6356,
+    "output": 1941,
+    "total": 8297,
+    "segment": "A1_aion_intro"
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "prompt": 6811,
+    "output": 2581,
+    "total": 9739,
+    "segment": "A2_aion_final"
+  },
+  {
+    "model": "gemini-3.8-flash",
+    "prompt": 7908,
+    "output": 1409,
+    "total": 10728,
+    "segment": "B1_dakdori_intro"
+  },
+  {
+    "model": "gemini-3.7-flash",
+    "prompt": 7358,
+    "output": 1503,
+    "total": 10148,
+    "segment": "B2_dakdori_4people"
+  }
+]
