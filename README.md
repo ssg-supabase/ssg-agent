@@ -20,6 +20,10 @@ cp .env.example .env             # Windows: copy .env.example .env
 - 시작할 때: `git pull`
 - 끝날 때: `git add .` → `git commit -m "내용"` → `git push`
 
+## 설계도
+
+전체 쇼츠 자동화 설계: [docs/blueprint.md](docs/blueprint.md)
+
 ## 진행 단계
 
 - [x] 1단계: Claude 연결 테스트 — `python hello_claude.py`
