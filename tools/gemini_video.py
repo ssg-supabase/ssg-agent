@@ -12,7 +12,9 @@ from google.genai import errors, types
 # .env 에 GEMINI_MODEL=... 을 적으면 다른 모델로 바꿀 수 있습니다.
 DEFAULT_MODEL = "gemini-3.8-flash"
 # 기본 모델이 붐비거나(503) 없을 때(404) 차례로 시도할 예비 모델
-BACKUP_MODELS = ["gemini-3.5-flash", "gemini-2.5-flash"]
+BACKUP_MODELS = ["gemini-3.7-flash", "gemini-3.5-flash", "gemini-3.1-flash-lite"]
+BUSY_CODES = (429, 500, 503)   # 일시적으로 붐빔 → 잠시 기다렸다 재시도
+RETRY_WAITS = [10, 30]         # 같은 모델 재시도 전 기다릴 초
 
 
 def _normalize_youtube_url(url: str) -> str:
@@ -47,13 +49,26 @@ def analyze_video(source: str, question: str) -> str:
     contents = types.Content(parts=[_video_part(client, source), types.Part(text=question)])
     models = [os.getenv("GEMINI_MODEL", DEFAULT_MODEL)] + BACKUP_MODELS
 
-    for i, model in enumerate(models):
-        try:
-            response = client.models.generate_content(model=model, contents=contents)
-            print(f"(사용한 모델: {model})")
-            return response.text
-        except (errors.ServerError, errors.ClientError) as e:
-            busy_or_missing = e.code in (404, 429, 500, 503)
-            if not busy_or_missing or i == len(models) - 1:
-                raise
-            print(f"{model} 사용 불가({e.code}) → {models[i + 1]} 로 다시 시도합니다...")
+    last_error = None
+    for model in models:
+        for attempt in range(len(RETRY_WAITS) + 1):
+            try:
+                response = client.models.generate_content(model=model, contents=contents)
+                print(f"(사용한 모델: {model})")
+                return response.text
+            except (errors.ServerError, errors.ClientError) as e:
+                last_error = e
+                if e.code == 404:  # 이 모델은 사용할 수 없음 → 다음 모델로
+                    print(f"{model}: 사용할 수 없는 모델(404) → 다음 모델로")
+                    break
+                if e.code not in BUSY_CODES:
+                    raise
+                if attempt < len(RETRY_WAITS):
+                    wait = RETRY_WAITS[attempt]
+                    print(f"{model}: 붐빔({e.code}) → {wait}초 기다렸다 다시 시도...")
+                    time.sleep(wait)
+                else:
+                    print(f"{model}: 계속 붐빔 → 다음 모델로")
+    raise RuntimeError(
+        "모든 Gemini 모델이 지금 응답하지 않습니다. 몇 분 뒤 다시 실행해 주세요."
+    ) from last_error
