@@ -1,0 +1,22 @@
+{
+  "id": "story",
+  "name": "스토리",
+  "length_sec": {
+    "min": 45,
+    "max": 90,
+    "default": 60
+  },
+  "structure": [
+    "상황",
+    "갈등",
+    "반전",
+    "여운/웃음"
+  ],
+  "tone": "캐릭터별 목소리, 대화체",
+  "visual": "캐릭터 중심, 표정 변화",
+  "bgm_mood": "장면별 전환",
+  "cautions": [
+    "캐릭터 일관성 최우선"
+  ],
+  "version": 1
+}

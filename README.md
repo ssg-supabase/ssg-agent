@@ -30,6 +30,10 @@ cp .env.example .env             # Windows: copy .env.example .env
 - [x] 2단계: Gemini 동영상 분석 — `python analyze_video.py 유튜브링크`
 - [x] 3단계: GPT 이미지 생성 — `python make_image.py "이미지 설명"`
 - [x] 4단계: Claude 지휘자 에이전트 — `python agent.py 유튜브링크` (분석 → 사실 확인 → 썸네일 → 보고서)
+- [x] M1 뼈대: 작업공간·채널·프로젝트 기록, 장르 템플릿, AI 역할 슬롯 — `python ssg.py --help`
+- [ ] M2 첫 mp4: 주제 → 지침 → 대본 → 음성 → 이미지 → 타임라인 → mp4
+
+관리자 화면 시안(테마 3종 전환): `docs/admin-prototype.html` 을 브라우저로 열기
 
 ## 기록
 

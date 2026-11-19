@@ -1,0 +1,24 @@
+{
+  "id": "product",
+  "name": "제품소개",
+  "length_sec": {
+    "min": 30,
+    "max": 45,
+    "default": 30
+  },
+  "structure": [
+    "불편 제기",
+    "제품 등장",
+    "기능 3개",
+    "가격·혜택",
+    "CTA"
+  ],
+  "tone": "친근·확신",
+  "visual": "제품 화면·사용 장면",
+  "bgm_mood": "업템포",
+  "cautions": [
+    "유료 광고면 광고 표시",
+    "과장 광고 금지"
+  ],
+  "version": 1
+}
